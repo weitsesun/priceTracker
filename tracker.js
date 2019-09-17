@@ -1,8 +1,11 @@
 const nightmare = require('nightmare')();
 
-// "priceblock_ourprice"
-const URL = "https://www.amazon.com/dp/B0756CYWWD/ref=twister_B075RYG44J";
-const TARGET_PRICE = 200;
+const args = process.argv.slice(2);
+
+const URL = args[0] || "https://www.amazon.com/dp/B0756CYWWD/ref=twister_B075RYG44J";
+const TARGET_PRICE = args[1] || 200;
+
+checkPrice();
 
 async function checkPrice() {
   console.log("Loading Price...")
@@ -11,7 +14,11 @@ async function checkPrice() {
                                      .evaluate(() => document.getElementById("priceblock_ourprice").innerText)
                                      .end();
   const priceNumber = parseFloat(priceString.replace("$", ""));
-  console.log(priceNumber);
+
+  if(priceNumber <= TARGET_PRICE) {
+    console.log("BUY IT NOW!");
+  } else {
+    console.log("It is expensive");
+  }
 }
 
-checkPrice();
