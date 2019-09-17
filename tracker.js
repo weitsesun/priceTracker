@@ -12,21 +12,25 @@ const TARGET_PRICE = args[1] || 500;
 checkPrice();
 
 async function checkPrice() {
-  console.log("Loading Price...")
-  const priceString = await nightmare.goto(URL)
-                                     .wait("#priceblock_ourprice")
-                                     .evaluate(() => document.getElementById("priceblock_ourprice").innerText)
-                                     .end();
-  const priceNumber = parseFloat(priceString.replace("$", ""));
+  console.log("Loading Price...");
+  try{
+    const priceString = await nightmare.goto(URL)
+                                      .wait("#priceblock_ourprice")
+                                      .evaluate(() => document.getElementById("priceblock_ourprice").innerText)
+                                      .end();
+    const priceNumber = parseFloat(priceString.replace("$", ""));
 
-  if(priceNumber <= TARGET_PRICE) {
-    sendEmail(
-      'Price is Low',
-      `The price on ${URL} has dropped below ${TARGET_PRICE}`,
-    )
-  } else {
-    console.log("It is expensive");
+    if(priceNumber <= TARGET_PRICE) {
+      sendEmail(
+        'Price is Low',
+        `The price on <a href="${URL}">${URL}</a> has dropped below $${TARGET_PRICE}`,
+      )
+    } 
+  } catch (e) {
+    sendEmail('Amazon Price Checker Error', e.message);
+    throw e;
   }
+  
 }
 
 
